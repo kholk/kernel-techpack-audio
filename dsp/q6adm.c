@@ -2917,7 +2917,8 @@ int adm_open(int port_id, int path, int rate, int channel_mode, int topology,
 	if (topology == VPM_TX_VOICE_SMECNS_V2_COPP_TOPOLOGY)
 		channel_mode = 1;
 
-#if defined(CONFIG_ARCH_SONY_NILE) || defined (CONFIG_ARCH_SONY_GANGES)
+#if defined(CONFIG_ARCH_SONY_NILE) || defined (CONFIG_ARCH_SONY_GANGES) || \
+    defined(CONFIG_ARCH_SONY_KUMANO)
 	if (path == ADM_PATH_PLAYBACK)
 		bit_width = 24;
 #endif
