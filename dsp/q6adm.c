@@ -49,6 +49,11 @@
 #define DS2_ADM_COPP_TOPOLOGY_ID 0xFFFFFFFF
 #endif
 
+//#ifdef AUDIO_SONY_FORCE_24BIT_COPP
+  #define APPTYPE_GENERAL_PLAYBACK 0x00011130
+  #define APPTYPE_SYSTEM_SOUNDS 0x00011131
+//#endif
+
 /* ENUM for adm_status */
 enum adm_cal_status {
 	ADM_STATUS_CALIBRATION_REQUIRED = 0,
@@ -2844,6 +2849,17 @@ int adm_open(int port_id, int path, int rate, int channel_mode, int topology,
 		 __func__, port_id, path, rate, channel_mode, perf_mode,
 		 topology);
 
+#if defined(CONFIG_ARCH_SONY_NILE) || defined (CONFIG_ARCH_SONY_GANGES) || \
+    defined(CONFIG_ARCH_SONY_KUMANO)
+        if (path == ADM_PATH_PLAYBACK || app_type == APPTYPE_GENERAL_PLAYBACK ||
+	    app_type == APPTYPE_SYSTEM_SOUNDS) {
+		pr_err("%s: Force 24-bits audio for APPTYPE 0x%x\n", __func__, app_type);
+                bit_width = 24;
+	} else
+		pr_err("%s: NOT forcing 24-bits audio for APPTYPE 0x%x\n", __func__, app_type);
+#endif
+
+
 	port_id = q6audio_convert_virtual_to_portid(port_id);
 	port_idx = adm_validate_and_get_port_index(port_id);
 	if (port_idx < 0) {
@@ -2917,8 +2933,11 @@ int adm_open(int port_id, int path, int rate, int channel_mode, int topology,
 	if (topology == VPM_TX_VOICE_SMECNS_V2_COPP_TOPOLOGY)
 		channel_mode = 1;
 
-#if defined(CONFIG_ARCH_SONY_NILE) || defined (CONFIG_ARCH_SONY_GANGES) || \
+#if defined(CONFIG_ARCH_SONY_NILE) || defined (CONFIG_ARCH_SONY_GANGES)
+/*
+ || \
     defined(CONFIG_ARCH_SONY_KUMANO)
+*/
 	if (path == ADM_PATH_PLAYBACK)
 		bit_width = 24;
 #endif
